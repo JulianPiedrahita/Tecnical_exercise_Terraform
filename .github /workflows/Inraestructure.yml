@@ -1,0 +1,22 @@
+name: Infraestructure
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  id-token: write
+  contents: write    
+
+jobs:
+
+  terraorm_format:
+    runs-on: ubuntu-latest
+    name: Check Terraform file are formatted correctly
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: terraform fmt
+        id: fmt 
+        run: terraform fmt     

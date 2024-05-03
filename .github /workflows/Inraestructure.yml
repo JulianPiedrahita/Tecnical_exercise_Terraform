@@ -3,19 +3,41 @@ name: Infraestructure
 on:
   push:
     branches: ["main"]
+    paths: ["infraestructure/**"]
 
 permissions:
   id-token: write
-  contents: write    
-
+  contents: write
+  pull-requests: write
+    
 jobs:
 
-  terraorm_format:
+  tfsec:
+
+    name: tfsec
     runs-on: ubuntu-latest
-    name: Check Terraform file are formatted correctly
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+
+
+  terraform_format:
+
+    name: Check Terraform file are formatted correctly
+    runs-on: ubuntu-latest
+    
+    steps:
+
+      - name: Clone repo
+        uses: actions/checkout@v4
+        
+      - name: hashicorp setup
+        uses: hashicorp/setup-terraform@v3
 
       - name: terraform fmt
         id: fmt 

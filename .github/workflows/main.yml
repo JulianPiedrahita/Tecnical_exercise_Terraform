@@ -29,6 +29,7 @@ jobs:
   terraform_format:
 
     name: Check Terraform file are formatted correctly
+    needs: [tfsec]
     runs-on: ubuntu-latest
     
     steps:

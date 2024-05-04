@@ -22,7 +22,7 @@ resource "aws_vpc" "network_dev" {
     var.vpc_tags,
   )
 
-  count = local.enable_flow_log ? 1 : 0
+  #count = local.enable_flow_log ? 1 : 0
 
   log_destination_type       = var.flow_log_destination_type
   log_destination            = local.flow_log_destination_arn

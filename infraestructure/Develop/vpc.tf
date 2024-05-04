@@ -1,5 +1,5 @@
 resource "aws_vpc" "network_dev" {
-  count = local.create_vpc ? 1 : 0
+  count = var.create_vpc ? 1 : 0
 
   cidr_block          = var.use_ipam_pool ? null : var.cidr
   ipv4_ipam_pool_id   = var.ipv4_ipam_pool_id
@@ -40,7 +40,6 @@ resource "aws_vpc" "network_dev" {
     var.vpc_tags,
     var.vpc_flow_log_tags,
   )
-
 
 }
 

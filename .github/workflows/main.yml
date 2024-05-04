@@ -3,7 +3,7 @@ name: Infraestructure
 on:
   push:
     branches: ["main"]
-    paths: ["develop/infraestructure/**"]
+    paths: ["Develop/infraestructure/**"]
 
 permissions:
   id-token: write

@@ -6,6 +6,12 @@ resource "aws_instance" "public_server" {
   subnet_id              = module.network.public_subnets[count.index]
   vpc_security_group_ids = [aws_security_group.server.id]
 
+  metadata_options {
+    http_tokens = "required"
+  }
+  root_block_device {
+      encrypted = true
+  }
   associate_public_ip_address = var.include_ipv4
   tags = {
     Name = "PublicServer-${count.index}"

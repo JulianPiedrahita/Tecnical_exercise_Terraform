@@ -44,7 +44,7 @@ resource "aws_vpc" "network_dev" {
     }
   }
 
-
+  tags = merge(var.vpc_flow_log_tags,)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {

@@ -34,13 +34,14 @@ resource "aws_vpc" "network_dev" {
       per_hour_partition         = var.flow_log_per_hour_partition
     }
   }
-    tags = merge(
+  tags = merge(
     { "Name" = var.name },
     var.tags,
     var.vpc_tags,
     var.vpc_flow_log_tags,
-
   )
+
+
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {

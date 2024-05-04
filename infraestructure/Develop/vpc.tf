@@ -1,21 +1,35 @@
-module "network" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "5.1.2"
-  
-  name = "web"
-  cidr = "10.0.0.0/16"
+resource "aws_vpc" "network_dev" {
+  count = local.create_vpc ? 1 : 0
 
-  azs             = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+  cidr_block          = var.use_ipam_pool ? null : var.cidr
+  ipv4_ipam_pool_id   = var.ipv4_ipam_pool_id
+  ipv4_netmask_length = var.ipv4_netmask_length
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  assign_generated_ipv6_cidr_block     = var.enable_ipv6 && !var.use_ipam_pool ? true : null
+  ipv6_cidr_block                      = var.ipv6_cidr
+  ipv6_ipam_pool_id                    = var.ipv6_ipam_pool_id
+  ipv6_netmask_length                  = var.ipv6_netmask_length
+  ipv6_cidr_block_network_border_group = var.ipv6_cidr_block_network_border_group
 
-  tags = {
-    Terraform   = "true"
-    Environment = "Dev"
-  }
+  instance_tenancy                     = var.instance_tenancy
+  enable_dns_hostnames                 = var.enable_dns_hostnames
+  enable_dns_support                   = var.enable_dns_support
+  enable_network_address_usage_metrics = var.enable_network_address_usage_metrics
+
+  tags = merge(
+    { "Name" = var.name },
+    var.tags,
+    var.vpc_tags,
+  )
+}
+
+resource "aws_vpc_ipv4_cidr_block_association" "this" {
+  count = local.create_vpc && length(var.secondary_cidr_blocks) > 0 ? length(var.secondary_cidr_blocks) : 0
+
+  # Do not turn this into `local.vpc_id`
+  vpc_id = aws_vpc.this[0].id
+
+  cidr_block = element(var.secondary_cidr_blocks, count.index)
 }
 
 resource "aws_flow_log" "flow_log_dev" {

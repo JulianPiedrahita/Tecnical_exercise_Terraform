@@ -38,11 +38,8 @@ resource "aws_vpc" "network_dev" {
     { "Name" = var.name },
     var.tags,
     var.vpc_tags,
-  )
-  
-  tags = merge(
-    { "Name" = var.name },
     var.vpc_flow_log_tags,
+
   )
 }
 

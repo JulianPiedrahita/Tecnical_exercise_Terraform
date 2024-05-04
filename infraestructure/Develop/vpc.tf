@@ -20,7 +20,6 @@ resource "aws_vpc" "network_dev" {
     { "Name" = var.name },
     var.tags,
     var.vpc_tags,
-    var.vpc_flow_log_tags
   )
 
   #count = local.enable_flow_log ? 1 : 0
@@ -44,7 +43,7 @@ resource "aws_vpc" "network_dev" {
     }
   }
 
-  
+  tags = merge(var.tags, var.vpc_flow_log_tags,)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {

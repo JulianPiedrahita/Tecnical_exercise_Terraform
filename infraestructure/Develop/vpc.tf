@@ -1,24 +1,3 @@
-resource "aws_vpc" "Vpc_Dev" {
-  count = local.create_vpc ? 1 : 0
-
-  cidr_block                       = var.cidr_block
-  ipv4_ipam_pool_id                = var.vpc_ipv4_ipam_pool_id
-  ipv4_netmask_length              = var.vpc_ipv4_netmask_length
-  assign_generated_ipv6_cidr_block = var.vpc_assign_generated_ipv6_cidr_block
-  ipv6_cidr_block                  = var.vpc_ipv6_cidr_block
-  ipv6_ipam_pool_id                = var.vpc_ipv6_ipam_pool_id
-  ipv6_netmask_length              = var.vpc_ipv6_netmask_length
-
-  enable_dns_hostnames = var.vpc_enable_dns_hostnames
-  enable_dns_support   = var.vpc_enable_dns_support
-  instance_tenancy     = var.vpc_instance_tenancy
-
-  tags = merge(
-    { "Name" = var.name },
-    module.tags.tags_aws
-  )
-}
-
 module "network" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.2"
@@ -32,11 +11,27 @@ module "network" {
 
   enable_nat_gateway = true
   single_nat_gateway = true
-  enable_flow_log    = true
-  vpc_flow_log_tags = local.tags
 
   tags = {
     Terraform   = "true"
     Environment = "Dev"
   }
 }
+
+resource "awscc_ec2_flow_log" "flow_log_dev" {
+  deliver_logs_permission_arn = awscc_iam_role.example.arn
+  log_destination_type        = "cloud-watch-logs"
+  log_destination             = awscc_logs_log_group.example.arn
+  traffic_type                = "ALL"
+  resource_id                 = var.vpc_id
+  resource_type               = "VPC"
+  tags = [{
+    key   = "Managed By"
+    value = "AWSCC"
+  }]
+}
+
+resource "awscc_logs_log_group" "flow_log_dev" {
+  log_group_name = "flow_log_dev"
+}
+

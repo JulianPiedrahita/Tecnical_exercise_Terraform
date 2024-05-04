@@ -16,12 +16,12 @@ resource "aws_vpc" "network_dev" {
   enable_dns_support                   = var.enable_dns_support
   enable_network_address_usage_metrics = var.enable_network_address_usage_metrics
 
-  #tags = merge(
-  #  { "Name" = var.name },
-  #  var.tags,
-  #  var.vpc_tags,
-  #  var.vpc_flow_log_tags,
-  #)
+  tags = merge(
+    { "Name" = var.name },
+    var.tags,
+    var.vpc_tags,
+    var.vpc_flow_log_tags,
+  )
 
   #count = local.enable_flow_log ? 1 : 0
 
@@ -44,12 +44,8 @@ resource "aws_vpc" "network_dev" {
     }
   }
 
-  tags = merge(
-    { "Name" = var.name },
-    var.tags,
-    var.vpc_tags,
-    var.vpc_flow_log_tags,
-  )
+  tags = logsvars(
+    var.tags, var.vpc_flow_log_tags,)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {

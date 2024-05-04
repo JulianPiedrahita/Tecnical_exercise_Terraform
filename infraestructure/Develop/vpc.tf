@@ -18,20 +18,28 @@ module "network" {
   }
 }
 
-resource "awscc_ec2_flow_log" "flow_log_dev" {
-  deliver_logs_permission_arn = awscc_iam_role.example.arn
-  log_destination_type        = "cloud-watch-logs"
-  log_destination             = awscc_logs_log_group.example.arn
-  traffic_type                = "ALL"
-  resource_id                 = var.vpc_id
-  resource_type               = "VPC"
-  tags = [{
-    key   = "Managed By"
-    value = "AWSCC"
-  }]
-}
+resource "aws_flow_log" "flow_log_dev" {
+  count = local.enable_flow_log ? 1 : 0
 
-resource "awscc_logs_log_group" "flow_log_dev" {
-  log_group_name = "flow_log_dev"
+  log_destination_type       = var.flow_log_destination_type
+  log_destination            = local.flow_log_destination_arn
+  log_format                 = var.flow_log_log_format
+  iam_role_arn               = local.flow_log_iam_role_arn
+  deliver_cross_account_role = var.flow_log_deliver_cross_account_role
+  traffic_type               = var.flow_log_traffic_type
+  vpc_id                     = local.vpc_id
+  max_aggregation_interval   = var.flow_log_max_aggregation_interval
+
+  dynamic "destination_options" {
+    for_each = var.flow_log_destination_type == "s3" ? [true] : []
+
+    content {
+      file_format                = var.flow_log_file_format
+      hive_compatible_partitions = var.flow_log_hive_compatible_partitions
+      per_hour_partition         = var.flow_log_per_hour_partition
+    }
+  }
+
+  tags = merge(var.tags, var.vpc_flow_log_tags)
 }
 

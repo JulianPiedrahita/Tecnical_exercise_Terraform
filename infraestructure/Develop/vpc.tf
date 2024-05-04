@@ -21,18 +21,7 @@ resource "aws_vpc" "network_dev" {
     var.tags,
     var.vpc_tags,
   )
-}
 
-resource "aws_vpc_ipv4_cidr_block_association" "this" {
-  count = local.create_vpc && length(var.secondary_cidr_blocks) > 0 ? length(var.secondary_cidr_blocks) : 0
-
-  # Do not turn this into `local.vpc_id`
-  vpc_id = aws_vpc.this[0].id
-
-  cidr_block = element(var.secondary_cidr_blocks, count.index)
-}
-
-resource "aws_flow_log" "flow_log_dev" {
   count = local.enable_flow_log ? 1 : 0
 
   log_destination_type       = var.flow_log_destination_type
@@ -57,3 +46,11 @@ resource "aws_flow_log" "flow_log_dev" {
   tags = merge(var.tags, var.vpc_flow_log_tags)
 }
 
+resource "aws_vpc_ipv4_cidr_block_association" "this" {
+  count = local.create_vpc && length(var.secondary_cidr_blocks) > 0 ? length(var.secondary_cidr_blocks) : 0
+
+  # Do not turn this into `local.vpc_id`
+  vpc_id = aws_vpc.this[0].id
+
+  cidr_block = element(var.secondary_cidr_blocks, count.index)
+}

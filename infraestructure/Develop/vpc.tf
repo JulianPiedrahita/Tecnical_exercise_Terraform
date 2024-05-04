@@ -16,12 +16,6 @@ resource "aws_vpc" "network_dev" {
   enable_dns_support                   = var.enable_dns_support
   enable_network_address_usage_metrics = var.enable_network_address_usage_metrics
 
-  tags = merge(
-    { "Name" = var.name },
-    var.tags,
-    var.vpc_tags,
-  )
-
   log_destination_type       = var.flow_log_destination_type
   log_destination            = var.flow_log_destination_arn
   log_format                 = var.flow_log_log_format
@@ -40,7 +34,12 @@ resource "aws_vpc" "network_dev" {
       per_hour_partition         = var.flow_log_per_hour_partition
     }
   }
-
+    tags = merge(
+    { "Name" = var.name },
+    var.tags,
+    var.vpc_tags,
+  )
+  
   tags = merge(
     { "Name" = var.name },
     var.vpc_flow_log_tags,
